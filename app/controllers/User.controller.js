@@ -1,119 +1,56 @@
-import bcrypt from "bcrypt";
-import User from "../../models/User.js";
+import bcrypt from 'bcrypt'
+import { UserService } from '../services/user.service.js'
 
 const UserController = {
   async getAll(req, res) {
     try {
-      const users = await User.findAll({
-        attributes: {
-          exclude: ["password"],
-        },
-      });
-      return res.json({ success: true, data: users });
+      const users = await UserService.getAll()
+      return res.status(200).json({
+        error: null,
+        message: 'Get all users successfully',
+        data: users
+      })
     } catch (error) {
-      console.error(error);
       return res.status(500).json({
-        success: false,
-        message: "Failed to get users",
-        error: error.message,
-      });
+        error: 'Internal Server Error',
+        message: 'Error in UserController.getAll - ' + error.message,
+        data: null
+      })
     }
   },
 
   async getProfile(req, res) {
     try {
-      const user = await User.findOne({
-        where: {
-          email: req.user.email,
-        },
-        attributes: ["name", "email"],
-      });
-      return res.json({ success: true, data: user });
+      const email = req.user.email
+      const user = await UserService.findUnique(email)
+      res.status(200).json(user)
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to get user profile",
-        error: error.message,
-      });
+      res.status(500).json({ message: error.message })
     }
   },
 
   async updateUser(req, res) {
-    const { name, email } = req.body;
-
     try {
-      const user = await User.findOne({
-        where: {
-          email: email,
-        },
-      });
-
-      if (!user) {
-        return res
-          .status(404)
-          .json({ success: false, message: "User not found" });
-      }
-
-      user.name = name;
-
-      await user.save();
-
-      return res.json({
-        success: true,
-        message: "User updated successfully!",
-      });
+      const email = req.user.email
+      const { name } = req.body
+      const user = await UserService.updateUser(email, name)
+      res.status(200).json(user)
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to update user",
-        error: error.message,
-      });
+      res.status(500).json({ message: error.message })
     }
   },
 
   async updatePassword(req, res) {
-    const { email, oldPassword, newPassword } = req.body;
-
     try {
-      const user = await User.findOne({
-        where: {
-          email: email,
-        },
-      });
-
-      if (!user) {
-        return res
-          .status(404)
-          .json({ success: false, message: "User not found" });
-      }
-
-      const compare = await bcrypt.compare(oldPassword, user.password);
-      if (!compare) {
-        return res
-          .status(401)
-          .json({ success: false, message: "Old password is incorrect" });
-      }
-
-      const newHashedPassword = await bcrypt.hash(newPassword, 10);
-
-      user.password = newHashedPassword;
-      await user.save();
-
-      return res.json({
-        success: true,
-        message: "Password updated successfully!",
-      });
+      const email = req.user.email
+      const { password } = req.body
+      const hashedPassword = await bcrypt.hash(password, 10)
+      const user = await UserService.updatePassword(email, hashedPassword)
+      res.status(200).json(user)
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to update password",
-        error: error.message,
-      });
+      res.status(500).json({ message: error.message })
     }
-  },
-};
+  }
+}
 
-export default UserController;
+export default UserController

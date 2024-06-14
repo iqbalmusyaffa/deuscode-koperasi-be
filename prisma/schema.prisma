@@ -1,0 +1,184 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    Int                   @id @default(autoincrement())
+  username              String
+  password              String
+  email                 String                @unique
+  phone                 String                @unique
+  profile_image         String
+  address               String
+  balance               Float
+  created_at            DateTime              @default(now())
+  updated_at            DateTime              @updatedAt
+  status_id             Int
+  role_id               Int
+  User_Status           User_Status           @relation(fields: [status_id], references: [id])
+  Role                  Role                  @relation(fields: [role_id], references: [id])
+  Product               Product[]
+  Savings_Balance       Savings_Balance[]
+  Gold_Deposit          Gold_Deposit[]
+  Transaction_History   Transaction_History[]
+  Loan_Application      Loan_Application[]
+  Purchase              Purchase[]
+  Complaint             Complaint[]
+  Fund_Transfer         Fund_Transfer[]
+  fundTransfersSent     Fund_Transfer[]       @relation("Sender")
+  fundTransfersReceived Fund_Transfer[]       @relation("Receiver")
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  role_name   String
+  permissions String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  User        User[]
+}
+
+model User_Status {
+  id          Int      @id @default(autoincrement())
+  status_name String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  User        User[]
+}
+
+model Savings_Balance {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  balance      Float
+  gold_balance Float
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  User         User     @relation(fields: [user_id], references: [id])
+}
+
+model Gold_Deposit {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  amount       Float
+  deposit_date DateTime
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  User         User     @relation(fields: [user_id], references: [id])
+}
+
+model Transaction_History {
+  id               Int      @id @default(autoincrement())
+  user_id          Int
+  type             String
+  amount           Float
+  description      String
+  transaction_date DateTime
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  User             User     @relation(fields: [user_id], references: [id])
+}
+
+model Fund_Transfer {
+  id            Int      @id @default(autoincrement())
+  sender_id     Int
+  receiver_id   Int
+  amount        Float
+  transfer_date DateTime
+  description   String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  Sender        User     @relation("Sender", fields: [sender_id], references: [id])
+  Receiver      User     @relation("Receiver", fields: [receiver_id], references: [id])
+  User          User?    @relation(fields: [userId], references: [id])
+  userId        Int?
+}
+
+model Loan_Application {
+  id               Int           @id @default(autoincrement())
+  user_id          Int
+  amount           Float
+  application_date DateTime
+  status           String
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
+  User             User          @relation(fields: [user_id], references: [id])
+  Loan_Status      Loan_Status[]
+}
+
+model Loan_Status {
+  id               Int              @id @default(autoincrement())
+  application_id   Int
+  status           String
+  status_date      DateTime
+  remarks          String
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
+  Loan_Application Loan_Application @relation(fields: [application_id], references: [id])
+}
+
+model Product {
+  id          Int        @id @default(autoincrement())
+  seller_id   Int
+  name        String
+  description String
+  price       Float
+  stock       Int
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  User        User       @relation(fields: [seller_id], references: [id])
+  Purchase    Purchase[]
+}
+
+model Purchase {
+  id            Int         @id @default(autoincrement())
+  buyer_id      Int
+  product_id    Int
+  quantity      Int
+  total_price   Float
+  purchase_date DateTime
+  status        String
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
+  User          User        @relation(fields: [buyer_id], references: [id])
+  Product       Product     @relation(fields: [product_id], references: [id])
+  Shipment      Shipment[]
+  Complaint     Complaint[]
+}
+
+model Shipment {
+  id               Int      @id @default(autoincrement())
+  purchase_id      Int
+  shipping_address String
+  shipping_method  String
+  shipping_cost    Float
+  shipping_date    DateTime
+  delivery_date    DateTime
+  status           String
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  Purchase         Purchase @relation(fields: [purchase_id], references: [id])
+}
+
+model Complaint {
+  id             Int      @id @default(autoincrement())
+  user_id        Int
+  order_id       Int
+  description    String
+  complaint_date DateTime
+  status         String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  User           User     @relation(fields: [user_id], references: [id])
+  Purchase       Purchase @relation(fields: [order_id], references: [id])
+}

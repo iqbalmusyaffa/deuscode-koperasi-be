@@ -1,148 +1,192 @@
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import User from "../../models/User.js";
-
+import { UserService } from '../services/user.service.js'
+import { jwt as JWT } from '../utils/jwt.js'
 class AuthController {
   static async login(req, res) {
-    const { email, password } = req.body;
-
     try {
-      const user = await User.findOne({ where: { email } });
+      const { email, password } = req.body
+      const user = await UserService.findUnique(email)
 
       if (!user) {
-        return res
-          .status(401)
-          .json({ success: false, message: "Invalid email or password" });
+        return res.status(404).json({
+          error: 'Bad Request',
+          message: 'User not found'
+        })
       }
 
-      const passwordMatch = await user.comparePassword(password);
-
-      if (!passwordMatch) {
-        return res
-          .status(401)
-          .json({ success: false, message: "Invalid email or password" });
+      const isPasswordValid = await UserService.comparePassword(
+        password,
+        user.password
+      )
+      if (!isPasswordValid) {
+        return res.status(401).json({
+          error: 'Unauthorized',
+          message: 'Password is incorrect'
+        })
       }
 
-      // Jika autentikasi berhasil, buat token JWT
-      const accessToken = jwt.sign(
-        { email: user.email, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRATION }
-      );
+      const { password: _, ...userWithoutPassword } = user
+      const accessToken = JWT.generateAccessToken(userWithoutPassword)
+      const refreshToken = JWT.generateRefreshToken(userWithoutPassword)
 
-      // Buat refreshToken
-      const refreshToken = jwt.sign(
-        { email: user.email, role: user.role },
-        process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: process.env.REFRESH_TOKEN_EXPIRATION }
-      );
-
-      // mengirimkan respons
-      return res.json({
-        success: true,
-        token: {
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-        },
-      });
+      return res.status(200).json({
+        error: null,
+        message: 'User Logged In Successfully',
+        data: {
+          user,
+          accessToken,
+          refreshToken
+        }
+      })
     } catch (error) {
-      console.error(error);
       return res.status(500).json({
-        success: false,
-        message: "Failed to log in",
-        error: error.message,
-      });
+        message: 'Error in Auth.controller.js: login - ' + error.message
+      })
     }
   }
 
   static async register(req, res) {
-    const {
-      name,
-      email,
-      password,
-      username,
-      role,
-      isActive,
-      activationToken,
-      status,
-    } = req.body;
-
     try {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await User.create({
-        name,
-        email,
-        password: hashedPassword,
+      const {
         username,
-        role,
-        isActive,
-        activationToken,
-        status,
-      });
+        password,
+        email,
+        phone,
+        profile_image,
+        address,
+        balance,
+        statusId,
+        roleId
+      } = req.body
+
+      // Validate request
+      if (
+        !username ||
+        !password ||
+        !email ||
+        !phone ||
+        !profile_image ||
+        !address ||
+        !balance ||
+        !statusId ||
+        !roleId
+      ) {
+        return res.status(400).json({
+          error: 'Bad Request',
+          message: 'Request body incomplete'
+        })
+      }
+
+      const existingUser = await UserService.findUnique(email)
+      if (existingUser) {
+        return res.status(400).json({
+          error: 'Bad Request',
+          message: 'User already exists'
+        })
+      }
+
+      const hashedPassword = await UserService.hashPassword(password)
+      const user = await UserService.createUser({
+        username,
+        password: hashedPassword,
+        email,
+        phone,
+        profile_image,
+        address,
+        balance,
+        statusId,
+        roleId
+      })
+
+      const { password: _, ...userWithoutPassword } = user
+      const accessToken = JWT.generateAccessToken(userWithoutPassword)
+      const refreshToken = JWT.generateRefreshToken(userWithoutPassword)
 
       return res.status(201).json({
-        success: true,
-        message: "User registered successfully",
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          username: user.username,
-          role: user.role,
-          isActive: user.isActive,
-          status: user.status,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        },
-      });
+        error: null,
+        message: 'User Registered Successfully',
+        data: {
+          user,
+          accessToken,
+          refreshToken
+        }
+      })
     } catch (error) {
-      console.error(error);
       return res.status(500).json({
-        success: false,
-        message: "Failed to register user",
-        error: error.message,
-      });
+        message: 'Error in Auth.controller.js: register - ' + error.message
+      })
     }
   }
 
   static async refreshToken(req, res) {
-    const { refreshToken } = req.body;
-
-    // Cek apakah refreshToken ada
-    if (!refreshToken) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Refresh token not provided" });
-    }
-
     try {
-      // Verifikasi refreshToken
-      const decoded = jwt.verify(
-        refreshToken,
-        process.env.REFRESH_TOKEN_SECRET
-      );
+      const { refreshToken } = req.body
+      if (!refreshToken) {
+        return res.status(400).json({
+          error: 'Bad Request',
+          message: 'Refresh token is required'
+        })
+      }
 
-      // Buat token JWT baru
-      const accessToken = jwt.sign(
-        { email: decoded.email, role: decoded.role },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRATION }
-      );
+      const user = JWT.verifyRefreshToken(refreshToken)
+      if (!user) {
+        return res.status(403).json({
+          error: 'Forbidden',
+          message: 'Invalid refresh token'
+        })
+      }
 
-      return res.json({ success: true, accessToken });
+      const { password: _, ...userWithoutPassword } = user
+      const accessToken = JWT.generateAccessToken(userWithoutPassword)
+      const newRefreshToken = JWT.generateRefreshToken(userWithoutPassword)
+
+      return res.status(200).json({
+        error: null,
+        message: 'Token Refreshed Successfully',
+        data: {
+          user,
+          accessToken,
+          refreshToken: newRefreshToken
+        }
+      })
     } catch (error) {
-      console.error(error);
-      return res.status(401).json({
-        success: false,
-        message: "Invalid refresh token",
-        error: error.message,
-      });
+      return res.status(500).json({
+        message: 'Error in Auth.controller.js: refreshToken - ' + error.message
+      })
     }
   }
 
   static async checkAuth(req, res) {
-    return res.json({ success: true });
+    try {
+      const { authorization } = req.headers
+      if (!authorization) {
+        return res.status(401).json({
+          error: 'Unauthorized',
+          message: 'Authorization header is required'
+        })
+      }
+
+      const token = authorization.split(' ')[1]
+      const user = JWT.verifyAccessToken(token)
+      if (!user) {
+        return res.status(403).json({
+          error: 'Forbidden',
+          message: 'Invalid token'
+        })
+      }
+
+      return res.status(200).json({
+        error: null,
+        message: 'User is authenticated',
+        data: {
+          user
+        }
+      })
+    } catch (error) {
+      return res.status(500).json({
+        message: 'Error in Auth.controller.js: checkAuth - ' + error.message
+      })
+    }
   }
 }
 
-export default AuthController;
+export default AuthController
