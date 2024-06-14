@@ -1,7 +1,7 @@
 # Api Koperasi
 ## Installation
 
-Install my-project with npm
+Install with npm
 
 ```bash
   npm install
@@ -12,19 +12,37 @@ Install my-project with npm
 Clone the project
 
 ```bash
-  git clone https://link-to-project
+  git clone git@github.com:iqbalmusyaffa/deuscode-koperasi-be.git
 ```
 
 Go to the project directory
 
 ```bash
-  cd my-project
+  cd deuscode-koperasi-be
 ```
 
 Install dependencies
 
 ```bash
   npm install
+```
+
+Run the migrations
+
+```bash
+  npm run migrate
+```
+
+Format with prettier
+
+```bash
+  npm run format
+```
+
+Lint the code
+
+```bash
+  npm run lint
 ```
 
 Start the server
