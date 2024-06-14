@@ -1,5 +1,5 @@
-const bcrypt = require("bcrypt");
-const User = require("../../models/User");
+import bcrypt from "bcrypt";
+import User from "../../models/User.js";
 
 const UserController = {
   async getAll(req, res) {
@@ -50,7 +50,9 @@ const UserController = {
       });
 
       if (!user) {
-        return res.status(404).json({ success: false, message: "User not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
       }
 
       user.name = name;
@@ -82,12 +84,16 @@ const UserController = {
       });
 
       if (!user) {
-        return res.status(404).json({ success: false, message: "User not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
       }
 
       const compare = await bcrypt.compare(oldPassword, user.password);
       if (!compare) {
-        return res.status(401).json({ success: false, message: "Old password is incorrect" });
+        return res
+          .status(401)
+          .json({ success: false, message: "Old password is incorrect" });
       }
 
       const newHashedPassword = await bcrypt.hash(newPassword, 10);
@@ -110,4 +116,4 @@ const UserController = {
   },
 };
 
-module.exports = UserController;
+export default UserController;

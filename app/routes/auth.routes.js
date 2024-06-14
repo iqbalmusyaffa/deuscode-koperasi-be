@@ -1,7 +1,7 @@
-const express = require("express");
-const loggerMiddleware = require("../middleware/logger.middleware.js");
-const authMiddleware = require("../middleware/auth.middleware.js");
-const AuthController = require("../controllers/Auth.controller.js");
+import express from "express";
+import loggerMiddleware from "../middleware/logger.middleware.js";
+import authMiddleware from "../middleware/auth.middleware.js";
+import AuthController from "../controllers/Auth.controller.js";
 
 const router = express.Router();
 
@@ -20,4 +20,4 @@ router.post("/refresh-token", AuthController.refreshToken);
 // Rute untuk check authorization
 router.get("/check-authorization", authMiddleware, AuthController.checkAuth);
 
-module.exports = router;
+export default router;

@@ -1,9 +1,9 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const routes = require("./app/routes/index.routes.js");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
+import express from "express";
+import bodyParser from "body-parser";
+import routes from "./app/routes/index.js";
+import dotenv from "dotenv";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -16,7 +16,6 @@ app.use(bodyParser.json());
 // Middleware untuk parse cookie
 app.use(cookieParser());
 
-// Set konfigurasi CORS
 const corsOption = {
   // origin: "https://indekos.art",
   origin: "http://127.0.0.1:5500",
@@ -35,4 +34,4 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-module.exports = app;
+export default app;

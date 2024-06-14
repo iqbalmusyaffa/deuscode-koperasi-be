@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const User = require("../../models/User.js");
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import User from "../../models/User.js";
 
 class AuthController {
   static async login(req, res) {
@@ -10,13 +10,17 @@ class AuthController {
       const user = await User.findOne({ where: { email } });
 
       if (!user) {
-        return res.status(401).json({ success: false, message: "Invalid email or password" });
+        return res
+          .status(401)
+          .json({ success: false, message: "Invalid email or password" });
       }
 
       const passwordMatch = await user.comparePassword(password);
 
       if (!passwordMatch) {
-        return res.status(401).json({ success: false, message: "Invalid email or password" });
+        return res
+          .status(401)
+          .json({ success: false, message: "Invalid email or password" });
       }
 
       // Jika autentikasi berhasil, buat token JWT
@@ -52,19 +56,28 @@ class AuthController {
   }
 
   static async register(req, res) {
-    const { name, email, password, username, role, isActive, activationToken, status } = req.body;
+    const {
+      name,
+      email,
+      password,
+      username,
+      role,
+      isActive,
+      activationToken,
+      status,
+    } = req.body;
 
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await User.create({ 
-        name, 
-        email, 
+      const user = await User.create({
+        name,
+        email,
         password: hashedPassword,
         username,
         role,
         isActive,
         activationToken,
-        status
+        status,
       });
 
       return res.status(201).json({
@@ -97,12 +110,17 @@ class AuthController {
 
     // Cek apakah refreshToken ada
     if (!refreshToken) {
-      return res.status(400).json({ success: false, message: "Refresh token not provided" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Refresh token not provided" });
     }
 
     try {
       // Verifikasi refreshToken
-      const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+      const decoded = jwt.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET
+      );
 
       // Buat token JWT baru
       const accessToken = jwt.sign(
@@ -127,4 +145,4 @@ class AuthController {
   }
 }
 
-module.exports = AuthController;
+export default AuthController;

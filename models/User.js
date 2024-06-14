@@ -1,6 +1,6 @@
-const { DataTypes, Model } = require("sequelize");
-const sequelize = require("../config/sequelize.js");
-const bcrypt = require("bcrypt");
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../config/sequelize.js";
+import bcrypt from "bcrypt";
 
 class User extends Model {
   async comparePassword(password) {
@@ -29,8 +29,8 @@ User.init(
       unique: true,
     },
     role: {
-      type: DataTypes.ENUM('admin', 'user', 'seller'),
-      defaultValue: 'user',
+      type: DataTypes.ENUM("admin", "user", "seller"),
+      defaultValue: "user",
       allowNull: false,
     },
     isActive: {
@@ -43,8 +43,8 @@ User.init(
       allowNull: true,
     },
     status: {
-      type: DataTypes.ENUM('active', 'pending'),
-      defaultValue: 'pending',
+      type: DataTypes.ENUM("active", "pending"),
+      defaultValue: "pending",
       allowNull: false,
     },
   },
@@ -69,4 +69,4 @@ User.init(
   }
 );
 
-module.exports = User;
+export default User;

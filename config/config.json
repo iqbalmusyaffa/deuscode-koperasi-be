@@ -14,9 +14,9 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "animatio_admin",
-    "password": "hS#(2!s]KJgY",
-    "database": "animatio_indekos",
+    "username": "deuscode",
+    "password": "password",
+    "database": "deuscodebe",
     "host": "127.0.0.1",
     "dialect": "mysql"
   }
