@@ -15,13 +15,9 @@ datasource db {
 
 model User {
   id                    Int                   @id @default(autoincrement())
-  username              String
-  password              String
   email                 String                @unique
+  password              String
   phone                 String                @unique
-  profile_image         String
-  address               String
-  balance               Float
   created_at            DateTime              @default(now())
   updated_at            DateTime              @updatedAt
   status_id             Int
@@ -38,6 +34,38 @@ model User {
   Fund_Transfer         Fund_Transfer[]
   fundTransfersSent     Fund_Transfer[]       @relation("Sender")
   fundTransfersReceived Fund_Transfer[]       @relation("Receiver")
+  User_Profile          User_Profile[]
+  User_Balance          User_Balance[]
+  Referral_Code         Referral_Code[]
+}
+
+model User_Profile {
+  id            Int      @id @default(autoincrement())
+  user_id       Int
+  nik           String   @unique
+  name          String
+  profile_image String
+  address       String
+  birth_date    DateTime
+  User          User     @relation(fields: [user_id], references: [id])
+}
+
+model User_Balance {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  balance    Float
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  User       User     @relation(fields: [user_id], references: [id])
+}
+
+model Referral_Code {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  code       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  User       User     @relation(fields: [user_id], references: [id])
 }
 
 model Role {
