@@ -13,6 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// If user delete, all related data will be deleted
 model User {
   id                    Int                   @id @default(autoincrement())
   email                 String                @unique
@@ -22,8 +23,8 @@ model User {
   updated_at            DateTime              @updatedAt
   status_id             Int
   role_id               Int
-  User_Status           User_Status           @relation(fields: [status_id], references: [id])
-  Role                  Role                  @relation(fields: [role_id], references: [id])
+  User_Status           User_Status           @relation(fields: [status_id], references: [id], onDelete: Cascade)
+  Role                  Role                  @relation(fields: [role_id], references: [id], onDelete: Cascade)
   Product               Product[]
   Savings_Balance       Savings_Balance[]
   Gold_Deposit          Gold_Deposit[]
@@ -34,38 +35,38 @@ model User {
   Fund_Transfer         Fund_Transfer[]
   fundTransfersSent     Fund_Transfer[]       @relation("Sender")
   fundTransfersReceived Fund_Transfer[]       @relation("Receiver")
-  User_Profile          User_Profile[]
-  User_Balance          User_Balance[]
-  Referral_Code         Referral_Code[]
+  User_Profile          User_Profile?
+  User_Balance          User_Balance?
+  Referral_Code         Referral_Code?
 }
 
 model User_Profile {
   id            Int      @id @default(autoincrement())
-  user_id       Int
+  user_id       Int      @unique
   nik           String   @unique
   name          String
   profile_image String
   address       String
   birth_date    DateTime
-  User          User     @relation(fields: [user_id], references: [id])
+  User          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model User_Balance {
   id         Int      @id @default(autoincrement())
-  user_id    Int
+  user_id    Int      @unique
   balance    Float
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  User       User     @relation(fields: [user_id], references: [id])
+  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Referral_Code {
   id         Int      @id @default(autoincrement())
-  user_id    Int
+  user_id    Int      @unique
   code       String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  User       User     @relation(fields: [user_id], references: [id])
+  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Role {
@@ -92,7 +93,7 @@ model Savings_Balance {
   gold_balance Float
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
-  User         User     @relation(fields: [user_id], references: [id])
+  User         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Gold_Deposit {
@@ -102,7 +103,7 @@ model Gold_Deposit {
   deposit_date DateTime
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
-  User         User     @relation(fields: [user_id], references: [id])
+  User         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Transaction_History {
@@ -114,7 +115,7 @@ model Transaction_History {
   transaction_date DateTime
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
-  User             User     @relation(fields: [user_id], references: [id])
+  User             User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Fund_Transfer {
@@ -126,9 +127,9 @@ model Fund_Transfer {
   description   String
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
-  Sender        User     @relation("Sender", fields: [sender_id], references: [id])
-  Receiver      User     @relation("Receiver", fields: [receiver_id], references: [id])
-  User          User?    @relation(fields: [userId], references: [id])
+  Sender        User     @relation("Sender", fields: [sender_id], references: [id], onDelete: Cascade)
+  Receiver      User     @relation("Receiver", fields: [receiver_id], references: [id], onDelete: Cascade)
+  User          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId        Int?
 }
 
@@ -140,7 +141,7 @@ model Loan_Application {
   status           String
   created_at       DateTime      @default(now())
   updated_at       DateTime      @updatedAt
-  User             User          @relation(fields: [user_id], references: [id])
+  User             User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
   Loan_Status      Loan_Status[]
 }
 
@@ -152,7 +153,7 @@ model Loan_Status {
   remarks          String
   created_at       DateTime         @default(now())
   updated_at       DateTime         @updatedAt
-  Loan_Application Loan_Application @relation(fields: [application_id], references: [id])
+  Loan_Application Loan_Application @relation(fields: [application_id], references: [id], onDelete: Cascade)
 }
 
 model Product {
@@ -164,7 +165,7 @@ model Product {
   stock       Int
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
-  User        User       @relation(fields: [seller_id], references: [id])
+  User        User       @relation(fields: [seller_id], references: [id], onDelete: Cascade)
   Purchase    Purchase[]
 }
 
@@ -178,8 +179,8 @@ model Purchase {
   status        String
   created_at    DateTime    @default(now())
   updated_at    DateTime    @updatedAt
-  User          User        @relation(fields: [buyer_id], references: [id])
-  Product       Product     @relation(fields: [product_id], references: [id])
+  User          User        @relation(fields: [buyer_id], references: [id], onDelete: Cascade)
+  Product       Product     @relation(fields: [product_id], references: [id], onDelete: Cascade)
   Shipment      Shipment[]
   Complaint     Complaint[]
 }
@@ -195,7 +196,7 @@ model Shipment {
   status           String
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
-  Purchase         Purchase @relation(fields: [purchase_id], references: [id])
+  Purchase         Purchase @relation(fields: [purchase_id], references: [id], onDelete: Cascade)
 }
 
 model Complaint {
@@ -207,6 +208,6 @@ model Complaint {
   status         String
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
-  User           User     @relation(fields: [user_id], references: [id])
-  Purchase       Purchase @relation(fields: [order_id], references: [id])
+  User           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  Purchase       Purchase @relation(fields: [order_id], references: [id], onDelete: Cascade)
 }

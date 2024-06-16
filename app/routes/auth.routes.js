@@ -14,6 +14,9 @@ router.post('/register', AuthController.register)
 // Rute untuk masuk (login) pengguna
 router.post('/login', AuthController.login)
 
+// Rute untuk verifikasi email
+router.get('/verify-email', AuthController.verifyEmail)
+
 // Rute untuk refresh token
 router.post('/refresh-token', AuthController.refreshToken)
 

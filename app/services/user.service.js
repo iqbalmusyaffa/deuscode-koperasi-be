@@ -15,10 +15,33 @@ export const UserService = {
     return await compare(password, hashedPassword)
   },
 
-  async updateUser(email, name) {
+  async createUser(data) {
+    return await prisma.user.create({ data })
+  },
+
+  async createUserProfile(data) {
+    return await prisma.user_Profile.create({ data })
+  },
+
+  async createUserBalance(data) {
+    return await prisma.user_Balance.create({ data })
+  },
+
+  async hashPassword(password) {
+    return await Bcrypt.encryptPassword(password)
+  },
+
+  async updateUser(id, name) {
     return await prisma.user.update({
-      where: { email },
+      where: { id },
       data: { name }
+    })
+  },
+
+  async activateUser(id) {
+    return await prisma.user.update({
+      where: { id },
+      data: { status_id: 1 }
     })
   },
 
