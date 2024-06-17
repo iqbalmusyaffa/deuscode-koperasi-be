@@ -16,7 +16,7 @@ class AuthController {
         })
       }
 
-      const status = await StatusService.findUnique('Active')
+      const status = await StatusService.findUnique(1)
       if (user.status_id !== status.id) {
         return res.status(403).json({
           error: 'Forbidden',

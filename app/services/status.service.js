@@ -4,9 +4,9 @@ export const StatusService = {
   async getAll() {
     return await prisma.user_Status.findMany()
   },
-  async findUnique(status_name) {
+  async findUnique(id) {
     return await prisma.user_Status.findUnique({
-      where: { status_name }
+      where: { id }
     })
   },
   async createStatus(status_name) {
