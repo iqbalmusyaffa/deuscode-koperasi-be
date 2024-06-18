@@ -1,83 +1,75 @@
-const Product = require('../models/Product')
+import * as productService from '../services/product.service.js';
 
-exports.getAllProducts = async (req, res) => {
+export const createProduct = async (req, res) => {
   try {
-    const products = await Product.findAll()
-    res.status(200).json(products)
+    const { seller_id, name, description, price, stock } = req.body;
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+    const product = await productService.createProduct({
+      seller_id: parseInt(seller_id, 10),
+      name,
+      description,
+      price: parseFloat(price),
+      stock: parseInt(stock, 10),
+      image: imagePath,
+    });
+    res.status(201).json(product);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: 'An error occurred while fetching products.' })
+    res.status(500).json({ error: error.message });
   }
-}
+};
 
-exports.getSingleProduct = async (req, res) => {
-  const { id } = req.params
-
+export const getProducts = async (req, res) => {
   try {
-    const product = await Product.findByPk(id)
+    const products = await productService.getProducts();
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
+export const getProductById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await productService.getProductById(id);
     if (!product) {
-      return res.status(404).json({ message: 'Product not found.' })
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, price, stock } = req.body;
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+
+    const updatedData = {
+      name,
+      description,
+      price: parseFloat(price),
+      stock: parseInt(stock, 10),
+    };
+
+    if (imagePath) {
+      updatedData.image = imagePath;
     }
 
-    res.status(200).json(product)
+    const product = await productService.updateProduct(id, updatedData);
+    res.status(200).json(product);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: 'An error occurred while fetching the product.' })
+    res.status(500).json({ error: error.message });
   }
-}
+};
 
-exports.createProduct = async (req, res) => {
-  const { name, price, description } = req.body
-
+export const deleteProduct = async (req, res) => {
   try {
-    const newProduct = await Product.create({ name, price, description })
-    res.status(201).json(newProduct)
+    const { id } = req.params;
+    await productService.deleteProduct(id);
+    res.status(204).send();
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: 'An error occurred while creating the product.' })
+    res.status(500).json({ error: error.message });
   }
-}
-
-exports.updateProduct = async (req, res) => {
-  const { id } = req.params
-  const { name, price, description } = req.body
-
-  try {
-    const updatedProduct = await Product.update(
-      { name, price, description },
-      { where: { id } }
-    )
-
-    if (updatedProduct[0] === 0) {
-      return res.status(404).json({ message: 'Product not found.' })
-    }
-
-    res.status(200).json(updatedProduct[0])
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: 'An error occurred while updating the product.' })
-  }
-}
-
-exports.deleteProduct = async (req, res) => {
-  const { id } = req.params
-
-  try {
-    const deletedProduct = await Product.destroy({ where: { id } })
-
-    if (deletedProduct === 0) {
-      return res.status(404).json({ message: 'Product not found.' })
-    }
-
-    res.status(200).json({ message: 'Product deleted successfully.' })
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: 'An error occurred while deleting the product.' })
-  }
-}
+};

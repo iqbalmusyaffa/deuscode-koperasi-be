@@ -163,6 +163,7 @@ model Product {
   description String
   price       Float
   stock       Int
+  image       String?
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
   User        User       @relation(fields: [seller_id], references: [id], onDelete: Cascade)

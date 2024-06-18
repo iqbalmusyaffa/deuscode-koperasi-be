@@ -25,7 +25,9 @@ const corsOption = {
 app.use(cors(corsOption))
 
 // Routes
+app.use('/uploads', express.static('uploads'));
 app.use('/api', routes)
+
 
 const PORT = process.env.PORT != null ? parseInt(process.env.PORT) : 3000
 
