@@ -4,6 +4,8 @@ import routes from './routes/index.js'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 const app = express()
 
@@ -17,15 +19,18 @@ app.use(bodyParser.json())
 app.use(cookieParser())
 
 const corsOption = {
-  origin: 'http://127.0.0.1:3000',
+  origin: 'http://localhost:8080',
   credentials: true
 }
 
 // Middleware CORS
 app.use(cors(corsOption))
 
+//path
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 // Routes
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 app.use('/api', routes)
 
 

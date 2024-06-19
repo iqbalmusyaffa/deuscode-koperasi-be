@@ -1,13 +1,19 @@
+// app/routes/product.routes.js
+
 import express from 'express';
-import * as productController from '../controllers/ProductController.js';
-import upload from '../utils/upload.js';
+import ProductController from '../controllers/Product.contoller.js';
+
 
 const router = express.Router();
 
-router.post('/create', upload.single('image'), productController.createProduct);
-router.get('/', productController.getProducts);
-router.get('/:id', productController.getProductById);
-router.put('/:id', upload.single('image'), productController.updateProduct);
-router.delete('/:id', productController.deleteProduct);
+// Use middleware for all routes in this router
+// router.use(authMiddleware, loggerMiddleware);
+
+// Define routes
+router.get('/', ProductController.getAll);
+router.get('/:id', ProductController.getById);
+router.post('/create', ProductController.upload.single('image'), ProductController.create);
+router.put('/update:id', ProductController.upload.single('image'), ProductController.update);
+router.delete('/delete:id', ProductController.delete);
 
 export default router;
