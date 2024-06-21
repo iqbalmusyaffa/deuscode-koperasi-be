@@ -39,56 +39,46 @@ class ProductService {
     }
   }
 
-  static async update(id, data) {
-    try {
-      // Ensure id is provided and convert it to an integer
-      const productId = parseInt(id, 10);
-  
-      // Log the parsed productId for debugging
-      console.log(`Parsed productId: ${productId}`);
-  
-      // Check if id is a valid integer
-      if (isNaN(productId) || productId <= 0) {
-        console.error(`Invalid id provided: ${id}`);
-        throw new Error('Invalid id provided');
-      }
-  
-      // Check if the product exists
-      const product = await prisma.product.findUnique({ where: { id: productId } });
-  
-      if (!product) {
-        throw new Error(`Product with id ${productId} not found`);
-      }
-  
-      // Extract and convert fields from data
-      const { seller_id, price, stock, ...updateData } = data;
-  
-      // Prepare the update data
-      const updatedData = {
-        ...updateData,
-        ...(price !== undefined && { price: parseFloat(price) }), // Convert price to float if provided
-        ...(stock !== undefined && { stock: parseInt(stock, 10) }), // Convert stock to integer if provided
-        ...(seller_id !== undefined && { seller_id: parseInt(seller_id, 10) }), // Convert seller_id to integer if provided
-      };
-  
-      // Update the product using Prisma
-      const updatedProduct = await prisma.product.update({
-        where: { id: productId },
-        data: updatedData,
-      });
-  
-      // Log success message
-      console.log(`Product with id ${productId} successfully updated`);
-  
-      return updatedProduct;
-    } catch (error) {
-      throw new Error(`Error in updateProduct: ${error.message}`);
-    }
-  }
-  
-  
-  
+ // Assuming this is within an Express.js controller
 
+ static async update(id, data) {
+  try {
+    // Ensure id is provided and convert it to an integer
+    const productId = parseInt(id, 10);
+
+    // Check if id is a valid integer
+    if (isNaN(productId) || productId <= 0) {
+      throw new Error('Invalid id provided');
+    }
+
+    // Destructure and convert fields from data
+    const { seller_id, price, stock, ...updateData } = data;
+
+    // Prepare the update data
+    const updatedData = {
+      ...updateData,
+      ...(price !== undefined && { price: parseFloat(price) }), // Convert price to float if provided
+      ...(stock !== undefined && { stock: parseInt(stock, 10) }), // Convert stock to integer if provided
+      ...(seller_id !== undefined && { seller_id: parseInt(seller_id, 10) }), // Convert seller_id to integer if provided
+    };
+
+    // Check if the product exists
+    const product = await prisma.product.findUnique({ where: { id: productId } });
+    if (!product) {
+      throw new Error(`Product with id ${productId} not found`);
+    }
+
+    // Update the product using Prisma
+    return await prisma.product.update({
+      where: { id: productId },
+      data: updatedData,
+    });
+  } catch (error) {
+    throw new Error(`Error in updateProduct: ${error.message}`);
+  }
+}
+
+  
   static async delete(id) {
     try {
       // Ensure id is provided and convert it to an integer
