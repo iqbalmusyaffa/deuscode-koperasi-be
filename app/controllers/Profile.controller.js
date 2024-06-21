@@ -135,7 +135,6 @@ export const ProfileController = {
     }
   },
 
-  // Update profile image by uploading a new image, then updating the profile image URL in the database, and deleting the old image, if any exists
   async updateProfileImage(req, res) {
     const { nik } = req.body
 
@@ -173,7 +172,7 @@ export const ProfileController = {
       )
 
       if (oldImage) {
-        await Upload.deleteImage(oldImage)
+        await upload.deleteImage(oldImage)
       }
 
       return res.status(200).json({
