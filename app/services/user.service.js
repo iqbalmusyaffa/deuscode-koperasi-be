@@ -7,6 +7,10 @@ export const UserService = {
     return await prisma.user.findMany()
   },
 
+  async findByRole(role) {
+    return await prisma.user.findMany({ where: { role } })
+  },
+
   async findUnique(email) {
     return await prisma.user.findUnique({ where: { email } })
   },
