@@ -2,6 +2,38 @@ import { ProfileService } from '../services/profile.service'
 import upload from '../utils/upload'
 
 export const ProfileController = {
+  async getById(req, res) {
+    const { nik } = req.params
+
+    if (!nik) {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'Request parameter incomplete'
+      })
+    }
+
+    try {
+      const profile = await ProfileService.findUnique(nik)
+
+      if (!profile) {
+        return res.status(404).json({
+          error: 'Not Found',
+          message: 'Profile not found'
+        })
+      }
+
+      return res.status(200).json({
+        error: null,
+        message: 'Request successful',
+        data: profile
+      })
+    } catch (error) {
+      return res.status(500).json({
+        message: 'Error in Profile.controller.js: getById - ' + error
+      })
+    }
+  },
+
   async updateNik(req, res) {
     const { nik, new_nik } = req.body
 
