@@ -135,25 +135,22 @@ model Fund_Transfer {
 
 model Loan_Application {
   id               Int           @id @default(autoincrement())
-  user_id          Int
+  user_id          Int            @unique
   amount           Float
   application_date DateTime
-  status           String
+  statusloan_id        Int
   created_at       DateTime      @default(now())
   updated_at       DateTime      @updatedAt
   User             User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  Loan_Status      Loan_Status[]
+  Loan_Status      Loan_Status   @relation(fields: [statusloan_id], references: [id], onDelete: Cascade)
 }
 
 model Loan_Status {
   id               Int              @id @default(autoincrement())
-  application_id   Int
-  status           String
-  status_date      DateTime
-  remarks          String
+  name_status      String
   created_at       DateTime         @default(now())
   updated_at       DateTime         @updatedAt
-  Loan_Application Loan_Application @relation(fields: [application_id], references: [id], onDelete: Cascade)
+  Loan_Application     Loan_Application[]
 }
 
 model Product {

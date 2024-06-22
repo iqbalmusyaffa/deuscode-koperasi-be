@@ -1,6 +1,4 @@
-// app/controllers/ProductController.js
-
-import { ProductService } from '../services/product.service.js'; // Adjust the import path as needed
+import { ProductService } from '../services/product.service.js';
 import multer from 'multer';
 
 // Configure multer for file uploads
@@ -30,12 +28,13 @@ class ProductController {
   static async getById(req, res) {
     try {
       const product = await ProductService.getById(req.params.id);
-      if (!product) {
-        return res.status(404).json({ message: 'Product not found' });
-      }
       res.status(200).json(product);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch product', message: error.message });
+      if (error.message === 'Invalid ID provided' || error.message === 'Product not found') {
+        res.status(404).json({ error: 'Product not found', message: error.message });
+      } else {
+        res.status(500).json({ error: 'Failed to fetch product', message: error.message });
+      }
     }
   }
 
@@ -43,7 +42,7 @@ class ProductController {
     try {
       const { seller_id, name, description, price, stock } = req.body;
       const image = req.file ? req.file.path : null;
-      
+
       const product = await ProductService.create({
         seller_id,
         name,
@@ -61,37 +60,32 @@ class ProductController {
 
   static async update(req, res) {
     try {
-      const { seller_id, name, description, price, stock } = req.body;
-      const image = req.file ? req.file.path : null;
-      
-      const product = await ProductService.update(req.params.id, {
-        seller_id,
-        name,
-        description,
-        price,
-        stock,
-        image,
-      });
-  
-      if (!product) {
-        return res.status(404).json({ message: 'Product not found' });
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id) || id <= 0) {
+        return res.status(400).json({ message: "Invalid ID provided. Please provide a positive integer ID." });
       }
-  
-      res.status(200).json(product);
+
+      // Mengambil data dari form-data
+      const { name, description, price, stock } = req.body;
+      const image = req.file ? req.file.path : undefined; // Mengambil path file jika ada file yang di-upload
+
+      const updatedProduct = await ProductService.update(id, { name, description, price, stock, image });
+      res.status(200).json(updatedProduct);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to update product', message: error.message });
+      res.status(500).json({ message: error.message });
     }
-  }  
+  }
 
   static async delete(req, res) {
     try {
-      const product = await ProductService.delete(req.params.id);
-      if (!product) {
-        return res.status(404).json({ message: 'Product not found' });
-      }
+      await ProductService.delete(req.params.id);
       res.status(200).json({ message: 'Product deleted' });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to delete product', message: error.message });
+      if (error.message === 'Invalid ID provided' || error.message === 'Product not found') {
+        res.status(404).json({ error: 'Product not found', message: error.message });
+      } else {
+        res.status(500).json({ error: 'Failed to delete product', message: error.message });
+      }
     }
   }
 }
