@@ -1,4 +1,4 @@
-import prisma from '../utils/client'
+import prisma from '../utils/client.js'
 
 export const BalanceService = {
   async getBalance(userId) {
