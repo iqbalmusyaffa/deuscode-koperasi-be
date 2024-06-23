@@ -38,6 +38,7 @@ model User {
   User_Profile          User_Profile?
   User_Balance          User_Balance?
   Referral_Code         Referral_Code?
+  Article               Article[]
 }
 
 model User_Profile {
@@ -208,4 +209,27 @@ model Complaint {
   updated_at     DateTime @updatedAt
   User           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   Purchase       Purchase @relation(fields: [order_id], references: [id], onDelete: Cascade)
+}
+
+model Article {
+  id             Int       @id @default(autoincrement())
+  title          String
+  description    String
+  imageUrl       String
+  favoriteCount  Int       @default(0)
+  viewCount      Int       @default(0)
+  comments       Comment[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  User           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         Int
+}
+
+model Comment {
+  id         Int      @id @default(autoincrement())
+  content    String
+  articleId  Int
+  Article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
