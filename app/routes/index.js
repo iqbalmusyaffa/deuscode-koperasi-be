@@ -6,11 +6,11 @@ import productRoutes from './product.routes.js'
 import balanceRoutes from './balance.routes.js'
 import transactionHistoryRoutes from './transactionHistory.routes.js'
 import pinjamanRoutes from './pinjaman.routes.js'
-import loanStatusRoutes from './loanStatus.routes.js'  
+import loanStatusRoutes from './loanStatus.routes.js'
 import savingsBalanceRoutes from './savingsBalance.routes.js'
 import goldDepositRoutes from './goldDeposit.routes.js'
 import fundTransferRoutes from './fundTransfer.routes.js'
-
+import complaintRoutes from './complaint.routes.js'
 
 const router = express.Router()
 
@@ -24,5 +24,6 @@ router.use('/statuspinjaman', loanStatusRoutes)
 router.use('/savings-balance', savingsBalanceRoutes)
 router.use('/gold-deposit', goldDepositRoutes)
 router.use('/fund-transfer', fundTransferRoutes)
+router.use('/complain', complaintRoutes)
 
 export default router
