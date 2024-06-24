@@ -198,6 +198,7 @@
 {"level":"info","message":"GET /","timestamp":"2024-06-23T18:14:04.673Z","user":{"created_at":"2024-06-22T16:45:40.308Z","email":"yusa82401@gmail.com","exp":1719167211,"iat":1719165411,"id":1,"phone":"0864517826781","role_id":1,"status_id":1,"updated_at":"2024-06-22T16:45:50.136Z"}}
 {"level":"info","message":"POST /login","timestamp":"2024-06-23T18:44:08.647Z"}
 {"level":"info","message":"POST /login","timestamp":"2024-06-24T00:26:13.184Z"}
+
 {"level":"info","message":"POST /login","timestamp":"2024-06-25T13:26:00.415Z"}
 {"level":"info","message":"GET /","timestamp":"2024-06-25T13:26:17.353Z","user":{"created_at":"2024-06-16T12:06:16.760Z","email":"anandabintang4@gmail.com","exp":1719323760,"iat":1719321960,"id":18,"phone":"08123456789","role_id":1,"status_id":1,"updated_at":"2024-06-16T12:11:12.189Z"}}
 {"level":"info","message":"GET /","timestamp":"2024-06-25T13:26:46.232Z","user":{"created_at":"2024-06-16T12:06:16.760Z","email":"anandabintang4@gmail.com","exp":1719323760,"iat":1719321960,"id":18,"phone":"08123456789","role_id":1,"status_id":1,"updated_at":"2024-06-16T12:11:12.189Z"}}
