@@ -22,7 +22,12 @@ const UserController = {
   async getProfile(req, res) {
     try {
       const email = req.user.email
-      const user = await UserService.findUnique(email)
+      const user = await UserService.findUnique(email, {
+        include: {
+          User_Profile: true,
+          User_Status: true // Include User_Status to fetch status details
+        }
+      })
       res.status(200).json(user)
     } catch (error) {
       res.status(500).json({ message: error.message })
@@ -32,8 +37,8 @@ const UserController = {
   async updateUser(req, res) {
     try {
       const email = req.user.email
-      const { name } = req.body
-      const user = await UserService.updateUser(email, name)
+      const { name, status_id } = req.body // Accept status_ids in the request body
+      const user = await UserService.updateUser(email, { name, status_id })
       res.status(200).json(user)
     } catch (error) {
       res.status(500).json({ message: error.message })
