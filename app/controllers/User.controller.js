@@ -33,6 +33,35 @@ const UserController = {
     }
   },
 
+  async getAllSeller(req, res) {
+    try {
+      const users = await UserService.getAllSeller()
+
+      // Get user profile and status details
+      for (const user of users) {
+        const profile = await ProfileService.findUser(user.id)
+        user.profile = profile
+      }
+
+      for (const user of users) {
+        const status = await StatusService.findUnique(user.status_id)
+        user.status = status
+      }
+
+      return res.status(200).json({
+        error: null,
+        message: 'Get all sellers successfully',
+        data: users
+      })
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Internal Server Error',
+        message: 'Error in UserController.getAllSeller - ' + error.message,
+        data: null
+      })
+    }
+  },
+
   async getProfile(req, res) {
     try {
       const email = req.user.email

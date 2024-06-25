@@ -7,6 +7,10 @@ export const UserService = {
     return await prisma.user.findMany()
   },
 
+  async getAllSeller() {
+    return await prisma.user.findMany({ where: { role_id: 2 } })
+  },
+
   async findByRole(role) {
     return await prisma.user.findMany({ where: { role } })
   },
