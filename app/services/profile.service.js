@@ -1,4 +1,4 @@
-import prisma from '../utils/client'
+import prisma from '../utils/client.js'
 
 export const ProfileService = {
   async getAll() {
@@ -7,6 +7,11 @@ export const ProfileService = {
   async findUnique(id) {
     return await prisma.user_Profile.findUnique({
       where: { id }
+    })
+  },
+  async findUser(user_id) {
+    return await prisma.user_Profile.findFirst({
+      where: { user_id }
     })
   },
   async createProfile(profile_name) {

@@ -1,6 +1,6 @@
 import express from 'express'
-import complaintController from '../controllers/complaint.controller.js'
-import loggerMiddleware from '../middlewares/logger.middleware.js'
+import complaintController from '../controllers/Complaint.controller.js'
+import loggerMiddleware from '../middleware/logger.middleware.js'
 
 const router = express.Router()
 

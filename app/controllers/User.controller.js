@@ -1,10 +1,18 @@
 import bcrypt from 'bcrypt'
 import { UserService } from '../services/user.service.js'
+import { ProfileService } from '../services/profile.service.js'
 
 const UserController = {
   async getAll(req, res) {
     try {
       const users = await UserService.getAll()
+
+      // Get user profile and status details
+      for (const user of users) {
+        const profile = await ProfileService.findUser(user.id)
+        user.profile = profile
+      }
+
       return res.status(200).json({
         error: null,
         message: 'Get all users successfully',

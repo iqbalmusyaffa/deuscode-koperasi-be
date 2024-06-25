@@ -1,7 +1,7 @@
 import { getComplains, createComplain } from '../services/complaint.service.js'
 
 class ComplaintController {
-  async createComplain(req, res) {
+  static async createComplain(req, res) {
     try {
       const data = req.body
       const result = await createComplain(data)
@@ -19,7 +19,7 @@ class ComplaintController {
     }
   }
 
-  async getComplains(req, res) {
+  static async getComplains(req, res) {
     try {
       const result = await getComplains()
       return res.status(200).json({
