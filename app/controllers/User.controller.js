@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt'
 import { UserService } from '../services/user.service.js'
 import { ProfileService } from '../services/profile.service.js'
+import { StatusService } from '../services/status.service.js'
 
 const UserController = {
   async getAll(req, res) {
@@ -11,6 +12,11 @@ const UserController = {
       for (const user of users) {
         const profile = await ProfileService.findUser(user.id)
         user.profile = profile
+      }
+
+      for (const user of users) {
+        const status = await StatusService.findUnique(user.status_id)
+        user.status = status
       }
 
       return res.status(200).json({

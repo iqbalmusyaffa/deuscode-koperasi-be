@@ -9,6 +9,11 @@ export const StatusService = {
       where: { id }
     })
   },
+  async findUser(user_id) {
+    return await prisma.user_Status.findFirst({
+      where: { user_id }
+    })
+  },
   async createStatus(status_name) {
     return await prisma.user_Status.create({
       data: { status_name }
