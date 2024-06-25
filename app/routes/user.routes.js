@@ -10,6 +10,7 @@ router.use(authMiddleware, loggerMiddleware)
 
 // Rute mendapat semua data user
 router.get('/', UserController.getAll)
+router.get('/seller', UserController.getAllSeller)
 router.get('/profile', UserController.getProfile)
 router.post('/update', UserController.updateUser)
 router.post('/update-password', UserController.updatePassword)
